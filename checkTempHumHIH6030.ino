@@ -26,27 +26,37 @@ void loop() {
 
   int i;
   int rc;
-  
+
+  // and empty i2c transaction triggers the measurement cycle
   Wire.beginTransmission( target ); 
   rc = Wire.endTransmission();
   
   if (rc != 0){
     Serial.print("Warning, start measurement failed\n"); 
   }
+
+  // check the datasheet for how long it takes, but 10ms seems to be enough
   delay(10);
   
   Serial.print(count++);  
   Serial.print(": ");
 
+  // should send back 4 bytes (2 bytes for temp, 2 for humidity)
   int avail = Wire.requestFrom( target, 4 );
   
+  // some chips may have only one sensor and will send back 2 bytes only
+  // should handle that case as well.
+
   if (avail == 4){
      for (i = 0; i < 4; i++){
        buffer[i] = Wire.readByte();
      }
+
+     // ugly maths, check the datasheet for details (page 6)
      h = ((((uint16_t) (buffer[0] & 0x3f)) << 8) | buffer[1]) / 163.820;
      t = ((((((uint16_t) buffer[2]) << 8) | buffer[3]) >> 2) / 16382.0) * 165 - 40;
      
+     // teensy can print floats. some arduinos cannot. you have been warned.
      Serial.print("temp: ");
      Serial.print(t);
      Serial.print(" ");
