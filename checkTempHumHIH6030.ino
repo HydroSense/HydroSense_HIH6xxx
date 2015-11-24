@@ -1,7 +1,8 @@
 
-
-// set this to the hardware serial port you wish to use
-//#define HWSERIAL Serial1
+/* This reads temp/ humidity measures from a honeywell i2c hih6xxx sensor using
+ * a TeensyLC mcu, so the i2c library is specific to this board.
+ *
+ * */
 
 #include <i2c_t3.h>
 
